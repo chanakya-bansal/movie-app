@@ -1,5 +1,5 @@
 import { View, Text,Image, FlatList, ActivityIndicator } from 'react-native'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { images } from '@/constants/images'
 import MovieCard from '@/components/MovieCard'
 import useFetch from "@/services/useFetch";
@@ -9,15 +9,29 @@ import SearchBar from '@/components/SearchBar';
 
 const search = () => {
 
-
+  const [searchQuery,setSearchQuery]=useState('');
 
   const {
     data:movies,
     loading:moviesLoading,
-    error:moviesError
+    error:moviesError,
+    refetch:loadMovies,
+    reset
   }=useFetch(()=>fetchMovies({
-    query:''
-  }))
+    query:searchQuery
+  }),false)
+
+  useEffect(()=>{
+    const func= async()=>{
+      if(searchQuery.trim()){
+        await loadMovies();
+      }else{
+        reset();
+      }
+    }
+
+    func();
+  },[searchQuery]);
 
 
 
@@ -43,7 +57,12 @@ const search = () => {
             <Image source={icons.logo} className='w-12 h-10'/>
           </View>
           <View className='my-5'>
-             <SearchBar placeholder='Search movies...'/>
+              <SearchBar
+                placeholder='Search movies...'
+                value={searchQuery}
+                onChangeText={(text:string)=>setSearchQuery(text)}
+
+                />
           </View>
 
           {moviesLoading &&(
@@ -54,10 +73,10 @@ const search = () => {
             <Text className='text-red-500 px-5 my-3'>Error :{moviesError.message}</Text>
           )}
 
-          {!moviesLoading && !moviesError && "SEARCH TERM".trim() && movies?.length>0 && (
+          {!moviesLoading && !moviesError && searchQuery.trim() && movies?.length>0 && (
             <Text className='text-xl text-white font-bold'>
               Search results for {''}
-              <Text className='text-accent'>SEARCH TERM</Text>
+              <Text className='text-accent'>{searchQuery}</Text>
             </Text>
           )} 
 
