@@ -1,5 +1,5 @@
 import { View, Text,Image, FlatList, ActivityIndicator } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import { images } from '@/constants/images'
 import MovieCard from '@/components/MovieCard'
 import useFetch from "@/services/useFetch";
@@ -23,25 +23,27 @@ const search = () => {
   }),false)
 
   useEffect(()=>{
-
-
     const timeoutId=setTimeout( async()=>{
       if(searchQuery.trim()){
         await loadMovies();
-
-        if(movies?.length>0 && movies?.[0]){
-          await updateSearchCount(searchQuery,movies[0]);
-        }
-
-
+        // if(movies?.length>0 && movies?.[0]){
+        //   console.log(searchQuery+" is updated")
+        //   await updateSearchCount(searchQuery,movies[0]);
+        // }
       }else{
         reset();
       }
-    },500);
-
+    },625);
     return ()=>clearTimeout(timeoutId);
-
   },[searchQuery]);
+
+  useEffect(()=>{
+     if(movies?.length>0 && movies?.[0]){
+          console.log(searchQuery+" is updated")
+          updateSearchCount(searchQuery,movies[0]);
+        }
+
+  },[movies]);
 
 
 
